@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="AI 招聘工作流作品集：简历筛选、岗位人才评估与面试前 Pretalk 智能备注。">
+  <title>AI 招聘工作流 · 作品集</title>
+  <style>
+    :root {
+      --ink: #132430;
+      --ink-soft: #304653;
+      --muted: #667984;
+      --line: #d9e4e8;
+      --canvas: #f6f8f7;
+      --white: #ffffff;
+      --teal: #0b756d;
+      --teal-pale: #e0f0eb;
+      --blue: #1d5fa7;
+      --blue-pale: #e8f1fb;
+      --coral: #cd5d44;
+      --coral-pale: #fcede8;
+      --yellow: #e7b53d;
+      --shadow: 0 18px 46px rgba(20, 41, 51, .08);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--canvas); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; line-height: 1.65; }
+    a { color: inherit; }
+    .wrap { width: min(1160px, calc(100% - 40px)); margin: 0 auto; }
+    .nav { position: sticky; top: 0; z-index: 5; background: rgba(246, 248, 247, .94); border-bottom: 1px solid rgba(217, 228, 232, .9); }
+    .nav-inner { min-height: 70px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .mark { display: flex; align-items: center; gap: 11px; color: var(--ink); text-decoration: none; font-weight: 800; }
+    .mark-symbol { width: 26px; height: 26px; position: relative; display: inline-block; border-radius: 7px; background: var(--teal); }
+    .mark-symbol::after { content: ""; position: absolute; width: 10px; height: 10px; right: -4px; bottom: -4px; border-radius: 50%; background: var(--coral); border: 3px solid var(--canvas); }
+    .nav-links { display: flex; align-items: center; gap: 22px; color: var(--muted); font-size: 14px; }
+    .nav-links a { text-decoration: none; }
+    .nav-links a:hover { color: var(--teal); }
+    .source-link { display: inline-flex; align-items: center; min-height: 36px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--white); color: var(--ink); font-weight: 700; }
+    .hero { padding: 78px 0 64px; background: var(--white); border-bottom: 1px solid var(--line); }
+    .hero-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(280px, .75fr); gap: 56px; align-items: end; }
+    .eyebrow { color: var(--teal); font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    h1 { max-width: 760px; margin: 13px 0 20px; font-size: clamp(42px, 6vw, 72px); line-height: 1.03; letter-spacing: 0; }
+    .hero-copy { max-width: 680px; margin: 0; color: var(--ink-soft); font-size: 19px; }
+    .hero-note { padding: 23px 0 4px 24px; border-left: 3px solid var(--coral); color: var(--ink-soft); }
+    .hero-note strong { display: block; margin-bottom: 6px; color: var(--ink); font-size: 17px; }
+    .counts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
+    .count { min-width: 122px; padding: 13px 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--canvas); }
+    .count strong { display: block; color: var(--teal); font-size: 25px; line-height: 1.1; }
+    .count span { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; }
+    section { padding: 76px 0; }
+    .section-head { max-width: 720px; margin-bottom: 32px; }
+    .section-head h2 { margin: 8px 0 10px; font-size: 34px; line-height: 1.17; letter-spacing: 0; }
+    .section-head p { margin: 0; color: var(--muted); }
+    .project-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
+    .project { min-height: 255px; padding: 26px; border: 1px solid var(--line); border-radius: 8px; background: var(--white); box-shadow: 0 4px 16px rgba(20, 41, 51, .025); }
+    .project:hover { border-color: #a7c8c3; box-shadow: var(--shadow); transform: translateY(-2px); }
+    .project.featured { grid-column: span 7; background: var(--ink); border-color: var(--ink); color: #fff; }
+    .project.campus { grid-column: span 5; background: var(--teal-pale); border-color: #beded4; }
+    .project.role { grid-column: span 4; }
+    .tag { display: inline-flex; align-items: center; min-height: 25px; padding: 2px 9px; border-radius: 999px; background: var(--blue-pale); color: var(--blue); font-size: 12px; font-weight: 800; }
+    .featured .tag { background: rgba(255,255,255,.13); color: #d7f2eb; }
+    .campus .tag { background: #c8e7dc; color: #126a5f; }
+    .project h3 { margin: 19px 0 9px; font-size: 23px; line-height: 1.2; letter-spacing: 0; }
+    .project p { margin: 0; color: var(--muted); font-size: 14px; }
+    .featured p { color: #c8d6dc; }
+    .project-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 26px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--ink-soft); font-size: 13px; font-weight: 700; }
+    .featured .project-foot { border-color: rgba(255,255,255,.18); color: #e6f1f3; }
+    .flow { background: #eaf1f2; }
+    .flow-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .step { padding: 0; }
+    .step-image { display: block; width: 100%; aspect-ratio: 1 / 1.33; object-fit: contain; object-position: top center; border: 1px solid var(--line); border-radius: 8px; background: #1b1f25; box-shadow: 0 9px 24px rgba(20, 41, 51, .09); }
+    .step h3 { margin: 16px 0 4px; font-size: 19px; }
+    .step p { margin: 0; color: var(--muted); font-size: 14px; }
+    .method-grid { display: grid; grid-template-columns: .92fr 1.08fr; gap: 24px; align-items: stretch; }
+    .method-intro { padding: 30px; border-radius: 8px; background: var(--coral); color: white; }
+    .method-intro .eyebrow { color: #fff0e9; }
+    .method-intro h2 { margin: 10px 0 14px; font-size: 31px; line-height: 1.15; }
+    .method-intro p { margin: 0; color: #fff5f0; }
+    .method-list { display: grid; gap: 1px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--line); }
+    .method { display: grid; grid-template-columns: 48px 1fr; gap: 14px; padding: 20px; background: var(--white); }
+    .method-id { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--blue-pale); color: var(--blue); font-size: 13px; font-weight: 800; }
+    .method h3 { margin: 2px 0 4px; font-size: 17px; }
+    .method p { margin: 0; color: var(--muted); font-size: 14px; }
+    .output { background: var(--white); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .output-grid { display: grid; grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr); gap: 24px; }
+    .sample { padding: 27px; border-radius: 8px; background: var(--ink); color: #ecf5f5; }
+    .sample-label { color: #a4ded2; font-size: 12px; font-weight: 800; letter-spacing: .09em; }
+    blockquote { margin: 18px 0 0; font-size: 16px; line-height: 1.85; }
+    .constraints { display: grid; gap: 12px; }
+    .constraint { display: flex; gap: 12px; padding: 16px; border: 1px solid var(--line); border-radius: 7px; background: var(--canvas); }
+    .constraint b { flex: 0 0 auto; display: grid; place-items: center; width: 25px; height: 25px; border-radius: 50%; background: var(--teal-pale); color: var(--teal); font-size: 12px; }
+    .constraint strong { display: block; margin-bottom: 1px; }
+    .constraint span { color: var(--muted); font-size: 14px; }
+    .code-section { background: #f3f7f8; }
+    .code-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .code-copy { padding: 24px; border: 1px solid var(--line); border-radius: 8px; background: var(--white); }
+    .code-copy h3 { margin: 0 0 9px; font-size: 21px; }
+    .code-copy p { margin: 0; color: var(--muted); }
+    pre { margin: 0; min-height: 228px; overflow: auto; padding: 23px; border-radius: 8px; background: #132430; color: #dcecef; font: 13px/1.8 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre-wrap; }
+    .privacy { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 26px 0; }
+    .privacy strong { display: block; font-size: 17px; }
+    .privacy p { max-width: 700px; margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+    .button { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 0 15px; border: 1px solid var(--ink); border-radius: 6px; background: var(--ink); color: white; font-weight: 800; font-size: 14px; text-decoration: none; white-space: nowrap; }
+    .button:hover { background: var(--teal); border-color: var(--teal); }
+    footer { padding: 31px 0 42px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+    .footer-inner { display: flex; justify-content: space-between; gap: 24px; }
+    @media (max-width: 820px) {
+      .nav-links { display: none; }
+      .hero { padding: 58px 0; }
+      .hero-grid, .method-grid, .output-grid, .code-layout { grid-template-columns: 1fr; gap: 28px; }
+      .project.featured, .project.campus, .project.role { grid-column: span 12; }
+      .flow-grid { grid-template-columns: 1fr; }
+      .step-image { aspect-ratio: 1 / 1.06; }
+      section { padding: 58px 0; }
+    }
+    @media (max-width: 520px) {
+      .wrap { width: min(100% - 28px, 1160px); }
+      h1 { font-size: 43px; }
+      .section-head h2 { font-size: 29px; }
+      .hero-copy { font-size: 17px; }
+      .privacy, .footer-inner { display: block; }
+      .privacy .button { margin-top: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="mark" href="#top"><span class="mark-symbol" aria-hidden="true"></span><span>AI Recruiting Toolkit</span></a>
+      <nav class="nav-links" aria-label="页面导航">
+        <a href="#projects">项目</a>
+        <a href="#workflow">工作流</a>
+        <a href="#method">方法</a>
+        <a href="#implementation">实现</a>
+      </nav>
+      <a class="source-link" href="https://github.com/fffffcl-0716/pretalk-portfolio" target="_blank" rel="noreferrer">查看源码</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <div class="eyebrow">Personal AI Practice Portfolio</div>
+          <h1>让招聘判断<br>更快、更清楚</h1>
+          <p class="hero-copy">围绕简历筛选、岗位人才评估和面试前沟通，把分散、重复的招聘信息转化为可追溯、可复用的 AI 工作流。</p>
+          <div class="counts" aria-label="项目概览">
+            <div class="count"><strong>05</strong><span>招聘 AI 工具</span></div>
+            <div class="count"><strong>03</strong><span>岗位评估模型</span></div>
+            <div class="count"><strong>01</strong><span>公开项目网站</span></div>
+          </div>
+        </div>
+        <aside class="hero-note">
+          <strong>从“写提示词”到“设计工作流”</strong>
+          每个工具都围绕真实招聘动作设计输入、判断规则、输出格式和信息边界，目标是让人保留决策权，让 AI 承担重复的信息整理。
+        </aside>
+      </div>
+    </section>
+
+    <section id="projects">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow">Selected work</div>
+          <h2>五个可复用的招聘 AI 工作流</h2>
+          <p>覆盖候选人进入流程前后的关键环节：初筛、岗位匹配判断、面试前信息沉淀与后续协作。</p>
+        </div>
+        <div class="project-grid">
+          <article class="project featured">
+            <span class="tag">面试前信息沉淀</span>
+            <h3>面试前 Pretalk 智能备注</h3>
+            <p>将业务筛选通过后的候选人 Pretalk 通话，转化为可直接录入招聘系统的一段备注。输出突出在职/离职状态、变动原因、薪资和求职意向，而不是笼统复述对话。</p>
+            <div class="project-foot"><span>智能记录 / 转写 → 标准化系统备注</span><span>查看下方流程 ↓</span></div>
+          </article>
+          <article class="project campus">
+            <span class="tag">校招初筛</span>
+            <h3>校招简历筛选</h3>
+            <p>将岗位要求转化为一致的初筛口径，快速提炼教育背景、项目经历、技能匹配点与待确认问题，减少重复阅读简历的时间成本。</p>
+            <div class="project-foot"><span>简历 → 初筛结论与追问点</span><span>规则优先</span></div>
+          </article>
+          <article class="project role">
+            <span class="tag">岗位人才评估 01</span>
+            <h3>AI 产品营销经理</h3>
+            <p>围绕 C 端 AI 应用增长、内容营销、效果投放、AI Native 与发布会操盘能力，给出结构化匹配判断。</p>
+            <div class="project-foot"><span>硬条件 + 能力维度</span><span>简历评估</span></div>
+          </article>
+          <article class="project role">
+            <span class="tag">岗位人才评估 02</span>
+            <h3>AI / 云产品营销专家</h3>
+            <p>识别云与 AI 产品经验、技术理解、产品营销/技术传播经历及内容能力，形成可复核的评估结构。</p>
+            <div class="project-foot"><span>产品技术 + 市场表达</span><span>简历评估</span></div>
+          </article>
+          <article class="project role">
+            <span class="tag">岗位人才评估 03</span>
+            <h3>战略传播市场专家</h3>
+            <p>聚焦文字内容能力、技术传播、AI 内容产出及候选人方向匹配，区分真正的内容/传播能力与不匹配经历。</p>
+            <div class="project-foot"><span>门槛校验 + 风险提示</span><span>简历评估</span></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="workflow" class="flow">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow">Workflow example</div>
+          <h2>从一通 Pretalk 电话到一条可用备注</h2>
+          <p>以面试前 Pretalk 智能备注为例，展示将原始信息接入 AI 工作流的最短路径。示意截图已完成脱敏。</p>
+        </div>
+        <div class="flow-grid">
+          <article class="step">
+            <img class="step-image" src="portfolio-step1-open-smart-record.jpg" alt="更多功能中的智能记录入口">
+            <h3>01 · 开启智能记录</h3>
+            <p>通话中生成可检索的会议内容，减少人工回忆和手写记录。</p>
+          </article>
+          <article class="step">
+            <img class="step-image" src="portfolio-step2-tap-more.jpg" alt="通话界面底部的更多按钮">
+            <h3>02 · 复制记录内容</h3>
+            <p>通话结束后取得可供 AI 处理的记录或转写信息。</p>
+          </article>
+          <article class="step">
+            <img class="step-image" src="portfolio-step3-copy-link.jpg" alt="会议助理中的复制链接按钮">
+            <h3>03 · 生成招聘备注</h3>
+            <p>由 AI 按既定规则提炼重点，产出一段可直接入库的文字。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="method">
+      <div class="wrap method-grid">
+        <div class="method-intro">
+          <div class="eyebrow">Design principles</div>
+          <h2>AI 不替代招聘判断，只把判断依据整理清楚</h2>
+          <p>工具的设计重点不是泛化总结，而是将岗位要求和招聘语境转成可执行的判断规则，让输出可以被复核、被追问、被直接使用。</p>
+        </div>
+        <div class="method-list">
+          <article class="method"><div class="method-id">01</div><div><h3>先定义真实任务</h3><p>从招聘动作出发，明确“谁在什么节点需要什么信息”，而非直接要求 AI 写一段泛泛总结。</p></div></article>
+          <article class="method"><div class="method-id">02</div><div><h3>将经验写成规则</h3><p>把岗位硬条件、评估维度、变动原因与待确认项拆成规则，使不同候选人的输出保持一致口径。</p></div></article>
+          <article class="method"><div class="method-id">03</div><div><h3>限制输出边界</h3><p>要求 AI 仅基于输入事实作答；信息不足时标注待确认，不补全猜测，不把候选人变成分数或标签。</p></div></article>
+          <article class="method"><div class="method-id">04</div><div><h3>输出嵌入原流程</h3><p>控制结构、长度和语言风格，让结果能直接进入招聘系统或作为面试沟通的判断依据。</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="output">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow">Output example</div>
+          <h2>让“变动原因”成为可判断的信息</h2>
+          <p>输出以事实为边界，把决定是否推进候选人的关键信息放在首位，而不是把通话内容拉长。</p>
+        </div>
+        <div class="output-grid">
+          <div class="sample">
+            <div class="sample-label">ANONYMIZED OUTPUT SAMPLE</div>
+            <blockquote>20261120候选人目前在职，计划寻找新的发展机会，主要原因是当前业务进入稳定阶段，工作内容重复度较高，团队调整后可承担的职责边界变窄，希望寻找更有成长空间的岗位。当前月薪约2.5万，期望薪资在现有基础上有一定涨幅，接受北京base，暂无明确其他offer。</blockquote>
+          </div>
+          <div class="constraints">
+            <div class="constraint"><b>A</b><div><strong>在职候选人</strong><span>优先解释“为什么现在看机会”，落到业务、岗位、团队、发展或薪酬等具体事由。</span></div></div>
+            <div class="constraint"><b>B</b><div><strong>离职候选人</strong><span>优先说明离职原因、主动或被动状态，以及离职后到目前为止的状态。</span></div></div>
+            <div class="constraint"><b>C</b><div><strong>信息边界</strong><span>只保留通话原文中出现的事实；数字和经历缺失时不猜测，直接省略或标记待确认。</span></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="implementation" class="code-section">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow">Public implementation</div>
+          <h2>实现思路：信息提取、规则匹配与受约束输出</h2>
+          <p>以下为对外展示的实现逻辑。项目不公开内部系统地址、真实简历、候选人信息或授权内容。</p>
+        </div>
+        <div class="code-layout">
+          <div class="code-copy">
+            <h3>核心处理链路</h3>
+            <p>将自然语言输入拆为可判断事实，再结合具体岗位或流程节点匹配不同规则，最后生成固定格式的结果。招聘同学始终保留最终判断权。</p>
+            <p style="margin-top:16px;">这个项目的源码、页面结构和脱敏素材均可在同一仓库中查看。</p>
+            <p style="margin-top:19px;"><a class="button" href="https://github.com/fffffcl-0716/pretalk-portfolio" target="_blank" rel="noreferrer">查看项目源码</a></p>
+          </div>
+          <pre><code>function buildRecruitingNote(input, roleRules) {
+  const facts = extractFacts(input, [
+    "employmentStatus", "changeReason",
+    "salary", "expectation", "location"
+  ]);
+
+  const rules = selectRules(
+    facts.employmentStatus,
+    roleRules
+  );
+
+  const result = summarize(facts, rules, {
+    evidenceOnly: true,
+    unknown: "待确认",
+    format: "singleParagraph",
+    length: "100-150 Chinese characters"
+  });
+
+  return validate(result, roleRules);
+}</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap privacy">
+        <div>
+          <strong>公开展示的内容经过脱敏处理</strong>
+          <p>页面仅展示项目方法、流程示意和虚构输出示例；不包含真实候选人简历、通话内容、内部系统入口或身份授权信息。</p>
+        </div>
+        <a class="button" href="https://github.com/fffffcl-0716/pretalk-portfolio" target="_blank" rel="noreferrer">访问项目仓库</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <span>AI Recruiting Toolkit · Personal Portfolio</span>
+      <span>Recruitment workflow design · 2026</span>
+    </div>
+  </footer>
+</body>
+</html>
